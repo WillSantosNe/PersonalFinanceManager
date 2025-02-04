@@ -9,6 +9,7 @@ O objetivo do sistema é permitir que os usuários acompanhem suas finanças de 
 
 ## **2️⃣ Objetivos do Sistema**
 O sistema foi projetado para atender as seguintes necessidades:
+
 ✅ **Registrar transações financeiras** (entradas e saídas de dinheiro).  
 ✅ **Classificar transações por categoria** para melhor organização financeira.  
 ✅ **Definir metas financeiras** para planejamento pessoal.  
