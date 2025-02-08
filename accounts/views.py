@@ -41,7 +41,6 @@ class UserViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if not request.user.is_staff and instance != request.user:
             raise PermissionDenied("You can only update your own profile.")
-
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
@@ -52,7 +51,6 @@ class UserViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if not request.user.is_staff and instance != request.user:
             raise PermissionDenied("You can only update your own profile.")
-
         return super().partial_update(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
@@ -61,6 +59,9 @@ class UserViewSet(viewsets.ModelViewSet):
         Regular users cannot delete any account, including their own.
         """
         if not self.request.user.is_staff:
-            raise PermissionDenied("Only staff members can delete users.")
-        
+            raise PermissionDenied("Only staff members can delete other users.")
+
+        if instance == self.request.user:
+            raise PermissionDenied("You cannot delete your own account.")
+
         instance.delete()
