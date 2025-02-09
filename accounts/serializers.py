@@ -10,3 +10,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'email', 'first_name', 'last_name']
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for admin users (shows more details).
+    """
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'email', 'first_name', 'last_name', 'is_active', 'is_staff']

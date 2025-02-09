@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from .models import CustomUser
-from .serializers import UserSerializer
+from .serializers import AdminUserSerializer, UserSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -14,6 +14,15 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_serializer_class(self):
+        """
+        Use different serializers for admins and regular users.
+        """
+        if self.request.user.is_staff:
+            return AdminUserSerializer
+        return UserSerializer
+
+
     def get_queryset(self):
         """
         Staff can see all users.
@@ -22,6 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return CustomUser.objects.all()
         return CustomUser.objects.filter(id=self.request.user.id)
+    
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -32,6 +42,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if not request.user.is_staff and instance != request.user:
             raise PermissionDenied("You can only view your own profile.")
         return super().retrieve(request, *args, **kwargs)
+    
 
     def update(self, request, *args, **kwargs):
         """
@@ -42,6 +53,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if not request.user.is_staff and instance != request.user:
             raise PermissionDenied("You can only update your own profile.")
         return super().update(request, *args, **kwargs)
+    
 
     def partial_update(self, request, *args, **kwargs):
         """
@@ -52,6 +64,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if not request.user.is_staff and instance != request.user:
             raise PermissionDenied("You can only update your own profile.")
         return super().partial_update(request, *args, **kwargs)
+    
 
     def perform_destroy(self, instance):
         """
