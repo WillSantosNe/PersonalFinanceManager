@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import CustomUser
 
-class UserSerializer():
+class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for the User model.
     Defines how user data is serialized/deserialized in the API.
