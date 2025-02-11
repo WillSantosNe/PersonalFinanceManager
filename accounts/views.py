@@ -48,6 +48,22 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         instance = self.get_object()
         return super().retrieve(request, *args, **kwargs)
+    
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new user. Only staff can create users with 'is_staff' or 'is_active'.
+        Regular users can only create normal accounts.
+        """
+        data = request.data.copy()
+        user = request.user
+
+        serializer = self.get_serializer(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
     
 
@@ -61,7 +77,7 @@ class UserViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("You can only update your own profile.")
 
         serializer = self.get_serializer(instance, data=request.data, partial=False)
-        serializer.is_valid(raise_exception=True) # um print funciona somente acima daqui
+        serializer.is_valid(raise_exception=True)
         serializer.save()
 
         

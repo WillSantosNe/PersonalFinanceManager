@@ -32,19 +32,34 @@ class UserSerializer(serializers.ModelSerializer):
 
         return data
 
+    
+    def validate(self, attrs):
+        request = self.context.get("request")
 
+        initial_data = getattr(self, "initial_data", {})
+        
+        if request and not request.user.is_staff:
+            if "is_active" in initial_data or "is_staff" in initial_data:
+                raise serializers.ValidationError({
+                    "detail": "You do not have permission to modify 'is_active' or 'is_staff'."
+                })
+            
+        return attrs
+
+
+     
 
 class AdminUserSerializer(serializers.ModelSerializer):
     """
     Serializer for admin users, allowing full control over users.
     """
-    password = serializers.CharField(write_only=True, required=False)  # ❗ Torna a senha opcional no update
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
         fields = ["id", "email", "first_name", "last_name", "is_active", "is_staff", "password"]
         extra_kwargs = {
-            "password": {"write_only": True, "required": False},  # ❗ Importante para tornar opcional
+            "password": {"write_only": True, "required": False},
         }
 
     def create(self, validated_data):
@@ -67,7 +82,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         if password:
-            instance.set_password(password)  # Se a senha foi enviada, hashea antes de salvar
+            instance.set_password(password) 
         instance.save()
         return instance
 
